@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Salud y hábitos | Escuela Provincial N° 711 “Federico Brandsen”</title>
+  <meta name="description" content="Calculadora integral de salud: IMC, TMB, actividad, hidratación, sueño, ejercicio, pantalla, alimentación y salud femenina, con gráficos y recomendaciones personalizadas." />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap">
+  <style>
+    :root{
+      --bg:#0a0a0d;
+      --card:#12121a;
+      --text:#fdfdfd;
+      --muted:#dcdcea;
+      --accent:#ff2bd6; /* fucsia neon */
+      --accent-2:#ff77e1;
+      --accent-3:#ffb3ec;
+      --pink:#ff8ab8;
+      --white:#ffffff;
+      --shadow:0 12px 30px rgba(255,43,214,0.18);
+      --good:#2ecc71;
+      --warn:#f1c40f;
+      --bad:#e74c3c;
+      --link:#87cefa;
+      --focus:#ffd6f6;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:linear-gradient(135deg,#0a0a0d 0%,#1a0f1f 45%,#0a0a0d 100%);color:var(--text);font-family:Poppins,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,sans-serif}
+    a{color:var(--link)}
+    /* Header */
+    header{
+      position:sticky;top:0;z-index:10;
+      background:linear-gradient(90deg,#1a0f1f 0%,#230b1f 100%);
+      border-bottom:1px solid rgba(255,255,255,0.08);
+      backdrop-filter: blur(8px);
+    }
+    .wrap{max-width:1100px;margin:0 auto;padding:18px}
+    .brand{
+      display:flex;align-items:center;gap:14px;flex-wrap:wrap
+    }
+    .logo{
+      width:42px;height:42px;border-radius:12px;
+      background:radial-gradient(circle at 30% 30%, var(--accent) 0%, var(--accent-2) 35%, transparent 36%), 
+                 radial-gradient(circle at 70% 70%, var(--accent-3) 0%, transparent 45%);
+      box-shadow:0 0 24px var(--accent-2), inset 0 0 16px rgba(255,255,255,0.18);
+      border:1px solid rgba(255,255,255,0.18);
+    }
+    h1{font-size:1.35rem;margin:0;letter-spacing:0.3px}
+    .subtitle{font-size:0.95rem;color:var(--muted)}
+    .controls{margin-top:10px;display:flex;gap:10px;flex-wrap:wrap}
+    .btn{
+      background:var(--accent);color:var(--white);
+      border:0;border-radius:999px;padding:10px 14px;font-weight:600;
+      box-shadow:var(--shadow);cursor:pointer;transition:transform .08s ease, filter .2s ease;
+    }
+    .btn:hover{filter:brightness(1.08)}
+    .btn:active{transform:scale(0.98)}
+    .btn.secondary{background:#2b2b35;color:var(--text);border:1px solid rgba(255,255,255,0.12)}
+    .btn.ghost{background:transparent;color:var(--text);border:1px dashed rgba(255,255,255,0.25)}
+    /* Layout */
+    main{max-width:1100px;margin:26px auto;padding:0 18px}
+    .grid{
+      display:grid;grid-template-columns:1fr;gap:18px
+    }
+    @media(min-width:980px){.grid{grid-template-columns:1.1fr 1fr}}
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.02) 100%);
+      border:1px solid rgba(255,255,255,0.12);
+      border-radius:18px;padding:16px 16px 18px;box-shadow:0 10px 24px rgba(0,0,0,0.25)
+    }
+    .card h2{margin:4px 0 8px;font-size:1.15rem}
+    .section-head{
+      display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px
+    }
+    /* Form */
+    form{display:grid;grid-template-columns:1fr;gap:14px}
+    @media(min-width:680px){form{grid-template-columns:1fr 1fr}}
+    label{display:block;font-weight:600;margin-bottom:6px}
+    .field{display:flex;flex-direction:column}
+    input,select,textarea{
+      background:#141422;color:var(--text);border:1px solid rgba(255,255,255,0.16);
+      border-radius:12px;padding:10px 12px;font-size:0.95rem;outline:none
+    }
+    input:focus,select:focus,textarea:focus{border-color:var(--accent-2);box-shadow:0 0 0 4px rgba(255,119,225,0.18)}
+    .hint{font-size:0.85rem;color:var(--muted)}
+    /* Chips */
+    .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+    .chip{
+      border:1px solid rgba(255,255,255,0.18);border-radius:999px;padding:6px 10px;font-size:0.85rem;color:var(--muted)
+    }
+    /* KPI & status */
+    .kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+    @media(min-width:980px){.kpis{grid-template-columns:repeat(4,1fr)}}
+    .kpi{
+      background:#12121f;border:1px solid rgba(255,255,255,0.10);
+      border-radius:14px;padding:12px;text-align:center
+    }
+    .kpi .value{font-size:1.3rem;font-weight:700}
+    .tag{display:inline-block;margin-top:4px;padding:4px 8px;border-radius:999px;font-size:0.8rem}
+    .tag.good{background:rgba(46,204,113,0.15);color:var(--good);border:1px solid rgba(46,204,113,0.4)}
+    .tag.warn{background:rgba(241,196,15,0.15);color:var(--warn);border:1px solid rgba(241,196,15,0.4)}
+    .tag.bad{background:rgba(231,76,60,0.18);color:var(--bad);border:1px solid rgba(231,76,60,0.4)}
+    /* Charts */
+    .charts{display:grid;grid-template-columns:1fr;gap:14px}
+    @media(min-width:980px){.charts{grid-template-columns:1fr 1fr}}
+    canvas{background:#0f0f16;border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:8px}
+    /* Recommendations */
+    .rec-list{display:grid;grid-template-columns:1fr;gap:10px}
+    .rec{
+      background:#101018;border:1px solid rgba(255,255,255,0.1);
+      border-left:4px solid var(--accent);border-radius:12px;padding:12px
+    }
+    .rec h3{margin:0 0 6px;font-size:1rem}
+    .rec p{margin:0;color:var(--muted)}
+    .badge{display:inline-block;margin-right:8px;margin-top:8px;padding:4px 8px;border-radius:999px;background:rgba(255,43,214,0.16);color:var(--accent-3);border:1px solid rgba(255,43,214,0.35);font-size:0.8rem}
+    /* Footer */
+    footer{margin:26px auto;max-width:1100px;padding:0 18px 38px;color:var(--muted);text-align:center}
+    .disclaimer{margin-top:12px;font-size:0.9rem}
+    /* Theme switch */
+    .theme-toggle{
+      display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,0.18);
+      background:#1a1a25;color:var(--text);cursor:pointer
+    }
+    .theme-toggle input{accent-color:var(--accent)}
+    /* Progress bar */
+    .progress{
+      height:12px;border-radius:999px;background:#141422;border:1px solid rgba(255,255,255,0.12);
+      overflow:hidden
+    }
+    .progress > div{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-3));width:0%}
+    /* Success toast */
+    .toast{
+      position:fixed;right:16px;bottom:16px;background:#101018;border:1px solid rgba(255,255,255,0.16);
+      border-radius:12px;padding:10px 12px;box-shadow:0 8px 24px rgba(0,0,0,0.35);color:var(--text);display:none
+    }
+    /* Accessibility */
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+  </style>
+</head>
+<body>
+  <header role="banner">
+    <div class="wrap">
+      <div class="brand" aria-label="Encabezado de la aplicación">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>Salud y hábitos | Escuela N° 711 “Federico Brandsen”</h1>
+          <div class="subtitle">Datos personales, hábitos y gráficos dinámicos con recomendaciones personalizadas</div>
+        </div>
+      </div>
+      <div class="controls">
+        <button class="btn" id="saveBtn">Guardar datos</button>
+        <button class="btn secondary" id="exportBtn">Exportar JSON</button>
+        <button class="btn ghost" id="importBtn">Importar JSON</button>
+        <label class="theme-toggle">
+          <input type="checkbox" id="themeSwitch" />
+          <span>Modo claro</span>
+        </label>
+      </div>
+    </div>
+  </header>
+
+  <main role="main">
+    <div class="grid">
+      <!-- Formulario principal -->
+      <section class="card" aria-labelledby="datos-title">
+        <div class="section-head">
+          <h2 id="datos-title">Datos personales y hábitos</h2>
+          <div class="chips">
+            <span class="chip">IMC</span>
+            <span class="chip">TMB</span>
+            <span class="chip">Hábitos</span>
+            <span class="chip">Ciclos</span>
+          </div>
+        </div>
+        <form id="healthForm">
+          <!-- Columna izquierda -->
+          <div class="field">
+            <label for="name">Nombre (opcional)</label>
+            <input id="name" name="name" type="text" placeholder="Tu nombre" autocomplete="name">
+          </div>
+
+          <div class="field">
+            <label for="age">Edad</label>
+            <input id="age" name="age" type="number" min="10" max="100" placeholder="Ej: 16" required>
+            <span class="hint">Usado para estimar TMB y recomendaciones generales.</span>
+          </div>
+
+          <div class="field">
+            <label for="gender">Género</label>
+            <select id="gender" name="gender" required>
+              <option value="f">Femenino</option>
+              <option value="m">Masculino</option>
+              <option value="o">Otro / Prefiero no decir</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="height">Estatura (cm)</label>
+            <input id="height" name="height" type="number" min="120" max="220" placeholder="Ej: 164" required>
+          </div>
+
+          <div class="field">
+            <label for="weight">Peso (kg)</label>
+            <input id="weight" name="weight" type="number" min="30" max="200" step="0.1" placeholder="Ej: 58.5" required>
+          </div>
+
+          <div class="field">
+            <label for="activity">Nivel de actividad</label>
+            <select id="activity" name="activity" required>
+              <option value="1.2">Sedentario (poco o ningún ejercicio)</option>
+              <option value="1.375">Ligero (1–3 días/semana)</option>
+              <option value="1.55">Moderado (3–5 días/semana)</option>
+              <option value="1.725">Intenso (6–7 días/semana)</option>
+              <option value="1.9">Muy intenso (entrenamientos dobles)</option>
+            </select>
+            <span class="hint">Afecta el gasto energético diario estimado.</span>
+          </div>
+
+          <!-- Columna derecha: hábitos -->
+          <div class="field">
+            <label for="hydration">Hidratación diaria (vasos de agua)</label>
+            <input id="hydration" name="hydration" type="number" min="0" max="30" placeholder="Ej: 6">
+            <span class="hint">Un vaso ~ 250 ml. Objetivo general: 6–8 vasos, según actividad.</span>
+          </div>
+
+          <div class="field">
+            <label for="exercise">Minutos de ejercicio por semana</label>
+            <input id="exercise" name="exercise" type="number" min="0" max="2000" placeholder="Ej: 120">
+            <span class="hint">Orientación general: 150–300 min/semana de actividad moderada.</span>
+          </div>
+
+          <div class="field">
+            <label for="sleep">Horas de sueño (promedio diario)</label>
+            <input id="sleep" name="sleep" type="number" min="0" max="18" step="0.1" placeholder="Ej: 7.5">
+            <span class="hint">Adolescentes y jóvenes suelen beneficiarse con ~8 horas.</span>
+          </div>
+
+          <div class="field">
+            <label for="screens">Horas frente a pantallas (promedio diario)</label>
+            <input id="screens" name="screens" type="number" min="0" max="24" step="0.1" placeholder="Ej: 4">
+            <span class="hint">Equilibrar estudio, descanso y ocio.</span>
+          </div>
+
+          <div class="field">
+            <label for="junk">Comida “chatarra” y bebidas azucaradas (porciones/semana)</label>
+            <input id="junk" name="junk" type="number" min="0" max="50" placeholder="Ej: 3">
+            <span class="hint">Reducir frecuencia y porciones mejora energía y bienestar.</span>
+          </div>
+
+          <div class="field">
+            <label for="healthyMeals">Comidas saludables (porciones/semana)</label>
+            <input id="healthyMeals" name="healthyMeals" type="number" min="0" max="70" placeholder="Ej: 14">
+            <span class="hint">Priorizar frutas, verduras, legumbres, granos integrales y agua.</span>
+          </div>
+
+          <!-- Salud e higiene femenina -->
+          <div class="field" style="grid-column:1/-1">
+            <label for="lastPeriod">Salud e higiene femenina (opcional)</label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+              <div class="field">
+                <label for="cycleLength">Duración de ciclo (días, promedio)</label>
+                <input id="cycleLength" name="cycleLength" type="number" min="15" max="60" placeholder="Ej: 28">
+              </div>
+              <div class="field">
+                <label for="lastPeriod">Fecha de último período</label>
+                <input id="lastPeriod" name="lastPeriod" type="date">
+              </div>
+            </div>
+            <span class="hint">Sirve para estimar ventana fértil y registrar regularidad. Si hay cambios significativos o molestias, consultar profesionales.</span>
+          </div>
+
+          <div style="grid-column:1/-1;display:flex;gap:10px;flex-wrap:wrap">
+            <button type="button" class="btn" id="calcBtn">Calcular y actualizar gráficos</button>
+            <button type="reset" class="btn secondary">Limpiar</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Resultados y KPIs -->
+      <section class="card" aria-labelledby="res-title">
+        <div class="section-head">
+          <h2 id="res-title">Resultados y estado</h2>
+          <div class="progress" aria-label="Progreso hacia hábitos saludables">
+            <div id="progressBar"></div>
+          </div>
+        </div>
+
+        <div class="kpis" aria-live="polite">
+          <div class="kpi">
+            <div class="label">IMC</div>
+            <div class="value" id="bmiValue">—</div>
+            <div class="tag" id="bmiTag">—</div>
+          </div>
+          <div class="kpi">
+            <div class="label">TMB (kcal/día)</div>
+            <div class="value" id="bmrValue">—</div>
+            <div class="tag" id="bmrTag">—</div>
+          </div>
+          <div class="kpi">
+            <div class="label">Gasto estimado (kcal/día)</div>
+            <div class="value" id="tdeeValue">—</div>
+            <div class="tag" id="tdeeTag">—</div>
+          </div>
+          <div class="kpi">
+            <div class="label">Índice de hábitos</div>
+            <div class="value" id="habitScore">—</div>
+            <div class="tag" id="habitTag">—</div>
+          </div>
+        </div>
+
+        <div style="margin-top:12px">
+          <p id="summaryText" style="color:var(--muted)">Ingresa tus datos para ver análisis y recomendaciones personalizadas.</p>
+        </div>
+      </section>
+    </div>
+
+    <!-- Gráficos -->
+    <section class="card" aria-labelledby="charts-title">
+      <div class="section-head">
+        <h2 id="charts-title">Gráficos dinámicos</h2>
+        <div class="chips">
+          <span class="chip">Tendencia IMC</span>
+          <span class="chip">Hidratación</span>
+          <span class="chip">Sueño</span>
+          <span class="chip">Pantalla</span>
+          <span class="chip">Alimentación</span>
+          <span class="chip">Ejercicio</span>
+        </div>
+      </div>
+      <div class="charts">
+        <canvas id="bmiChart" height="200" aria-label="Gráfico de IMC" role="img"></canvas>
+        <canvas id="habitRadar" height="200" aria-label="Radar de hábitos" role="img"></canvas>
+        <canvas id="sleepChart" height="200" aria-label="Gráfico de sueño vs pantalla" role="img"></canvas>
+        <canvas id="foodChart" height="200" aria-label="Gráfico de alimentos saludables vs chatarra" role="img"></canvas>
+      </div>
+    </section>
+
+    <!-- Recomendaciones y riesgos -->
+    <section class="card" aria-labelledby="rec-title">
+      <div class="section-head">
+        <h2 id="rec-title">Riesgos por hábitos y recomendaciones</h2>
+        <div class="chips">
+          <span class="chip">Bienestar</span>
+          <span class="chip">Prevención</span>
+          <span class="chip">Hábitos</span>
+        </div>
+      </div>
+      <div class="rec-list" id="recList">
+        <!-- Se llena dinámicamente -->
+      </div>
+    </section>
+
+    <!-- Seguimiento semanal -->
+    <section class="card" aria-labelledby="track-title">
+      <div class="section-head">
+        <h2 id="track-title">Seguimiento semanal</h2>
+        <div class="chips">
+          <span class="chip">Registro</span>
+          <span class="chip">Tendencias</span>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr;gap:12px">
+        <div class="field">
+          <label for="weekNote">Nota o meta de la semana</label>
+          <input id="weekNote" type="text" placeholder="Ej: Esta semana subo a 8 vasos de agua y 180 min de actividad.">
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn" id="addWeekBtn">Agregar registro semanal</button>
+          <button class="btn secondary" id="clearWeeksBtn">Borrar registros</button>
+        </div>
+        <div id="weeksContainer" style="display:grid;grid-template-columns:1fr 1fr;gap:10px"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer role="contentinfo">
+    <div>Hecho con dedicación para la muestra anual de la Escuela Provincial N° 711 “Federico Brandsen”, Comodoro Rivadavia, Chubut.</div>
+    <div class="disclaimer">Esta es una herramienta educativa. No ofrece diagnóstico médico ni reemplaza el consejo de profesionales.</div>
+  </footer>
+
+  <div class="toast" id="toast">Guardado ✔️</div>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script>
+    // Utilidades
+    const $ = (sel) => document.querySelector(sel);
+    const $$ = (sel) => document.querySelectorAll(sel);
+
+    const fmt = (n, d=1) => isFinite(n) ? Number(n).toFixed(d) : "—";
+    const clamp = (v,min,max)=>Math.max(min,Math.min(max,v));
+
+    const state = {
+      form: {},
+      trend: [], // IMC histórico
+      weeks: []  // registros semanales
+    };
+
+    // Tema claro/oscuro
+    const themeSwitch = $('#themeSwitch');
+    themeSwitch.addEventListener('change',()=>{
+      const light = themeSwitch.checked;
+      document.documentElement.style.setProperty('--bg', light ? '#fff5fa' : '#0a0a0d');
+      document.documentElement.style.setProperty('--card', light ? '#ffffff' : '#12121a');
+      document.body.style.background = light ? 'linear-gradient(135deg,#fff5fa 0%,#ffe8f7 45%,#fff5fa 100%)' : 'linear-gradient(135deg,#0a0a0d 0%,#1a0f1f 45%,#0a0a0d 100%)';
+    });
+
+    // Toast
+    function toast(msg='Guardado ✔️'){
+      const t = $('#toast'); t.textContent = msg; t.style.display='block';
+      setTimeout(()=>t.style.display='none',1400);
+    }
+
+    // Guardar/Exportar/Importar
+    const saveBtn = $('#saveBtn');
+    const exportBtn = $('#exportBtn');
+    const importBtn = $('#importBtn');
+
+    saveBtn.addEventListener('click', ()=>{
+      const data = readForm();
+      localStorage.setItem('healthData711', JSON.stringify({ ...state, form: data }));
+      toast();
+    });
+
+    exportBtn.addEventListener('click', ()=>{
+      const blob = new Blob([JSON.stringify({ ...state, form: readForm() }, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'salud_habitos_711.json';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+
+    importBtn.addEventListener('click', async ()=>{
+      const input = document.createElement('input');
+      input.type='file'; input.accept='application/json';
+      input.onchange = async () => {
+        const file = input.files[0]; if(!file) return;
+        const text = await file.text();
+        try{
+          const data = JSON.parse(text);
+          if(data.form){ fillForm(data.form); }
+          if(Array.isArray(data.trend)){ state.trend = data.trend; }
+          if(Array.isArray(data.weeks)){ state.weeks = data.weeks; renderWeeks(); }
+          updateAll();
+          toast('Importado ✔️');
+        }catch(e){ toast('Error al importar'); }
+      };
+      input.click();
+    });
+
+    // Leer y llenar formulario
+    function readForm(){
+      return {
+        name: $('#name').value.trim(),
+        age: Number($('#age').value),
+        gender: $('#gender').value,
+        height: Number($('#height').value), // cm
+        weight: Number($('#weight').value), // kg
+        activity: Number($('#activity').value),
+        hydration: Number($('#hydration').value),
+        exercise: Number($('#exercise').value),
+        sleep: Number($('#sleep').value),
+        screens: Number($('#screens').value),
+        junk: Number($('#junk').value),
+        healthyMeals: Number($('#healthyMeals').value),
+        cycleLength: Number($('#cycleLength').value),
+        lastPeriod: $('#lastPeriod').value
+      };
+    }
+    function fillForm(d){
+      $('#name').value = d.name || '';
+      $('#age').value = d.age || '';
+      $('#gender').value = d.gender || 'f';
+      $('#height').value = d.height || '';
+      $('#weight').value = d.weight || '';
+      $('#activity').value = d.activity || 1.2;
+      $('#hydration').value = d.hydration || '';
+      $('#exercise').value = d.exercise || '';
+      $('#sleep').value = d.sleep || '';
+      $('#screens').value = d.screens || '';
+      $('#junk').value = d.junk || '';
+      $('#healthyMeals').value = d.healthyMeals || '';
+      $('#cycleLength').value = d.cycleLength || '';
+      $('#lastPeriod').value = d.lastPeriod || '';
+    }
+
+    // Cálculos: IMC, TMB (Mifflin-St Jeor), TDEE, puntuación de hábitos
+    function calcMetrics(d){
+      const height_m = d.height/100;
+      const bmi = d.weight && height_m ? d.weight / (height_m*height_m) : NaN;
+
+      // Mifflin-St Jeor
+      // Hombres: 10*kg + 6.25*cm - 5*edad + 5
+      // Mujeres: 10*kg + 6.25*cm - 5*edad - 161
+      const base = 10*d.weight + 6.25*d.height - 5*d.age;
+      const bmr = d.gender === 'm' ? base + 5 : d.gender === 'f' ? base - 161 : base - 78; // término neutro aproximado
+      const tdee = bmr * d.activity;
+
+      // Puntuación de hábitos (0–100)
+      let score = 0;
+      // Hidratación: objetivo 6–8 vasos
+      if(d.hydration>0){
+        const diff = Math.abs(d.hydration - 7);
+        score += clamp(30 - diff*5, 0, 30);
+      }
+      // Sueño: objetivo ~8 h
+      if(d.sleep>0){
+        const diff = Math.abs(d.sleep - 8);
+        score += clamp(25 - diff*6, 0, 25);
+      }
+      // Ejercicio: 150–300 min/semana
+      if(d.exercise>=0){
+        if(d.exercise>=150 && d.exercise<=300) score += 20;
+        else if(d.exercise>300) score += 18;
+        else score += clamp(d.exercise/150*20, 0, 20);
+      }
+      // Pantallas: < 4–6 h diarias
+      if(d.screens>=0){
+        if(d.screens<=4) score += 15;
+        else if(d.screens<=6) score += 10;
+        else score += clamp(12 - (d.screens-6)*2, 0, 12);
+      }
+      // Alimentación: saludables vs chatarra
+      if(d.healthyMeals>=0 && d.junk>=0){
+        const ratio = d.healthyMeals / (d.junk+1);
+        if(ratio>=4) score += 10;
+        else score += clamp(ratio*2.5, 0, 10);
+      }
+      score = Math.round(clamp(score,0,100));
+
+      return { bmi, bmr, tdee, score };
+    }
+
+    // Clasificaciones
+    function bmiCategory(bmi){
+      if(!isFinite(bmi)) return { label:'—', cls:'' };
+      if(bmi < 18.5) return { label:'Bajo peso', cls:'warn' };
+      if(bmi < 25) return { label:'Saludable', cls:'good' };
+      if(bmi < 30) return { label:'Sobrepeso', cls:'warn' };
+      return { label:'Obesidad', cls:'bad' };
+    }
+
+    function tdeeTag(tdee){
+      if(!isFinite(tdee)) return { label:'—', cls:'' };
+      return { label:'Estimación diaria', cls:'good' };
+    }
+
+    function habitTag(score){
+      if(!isFinite(score)) return { label:'—', cls:'' };
+      if(score>=75) return { label:'Hábitos sólidos', cls:'good' };
+      if(score>=50) return { label:'Mejorando', cls:'warn' };
+      return { label:'Riesgo por hábitos', cls:'bad' };
+    }
+
+    // Resumen y recomendaciones
+    function buildSummary(d, m){
+      const name = d.name ? d.name + ': ' : '';
+      const cat = bmiCategory(m.bmi).label;
+      return `${name}IMC ${fmt(m.bmi)} (${cat}), TMB ${fmt(m.bmr,0)} kcal/día, gasto estimado ${fmt(m.tdee,0)} kcal/día. Índice de hábitos: ${m.score}/100.`;
+    }
+
+    function buildRecs(d, m){
+      const recs = [];
+      // Hidratación
+      if(d.hydration>0 && d.hydration<6){
+        recs.push({
+          title:'Más hidratación diaria',
+          text:'Lleva una botella y suma 1–2 vasos repartidos en el día (al despertar y a media tarde).',
+          badge:'Hidratación', level:'warn'
+        });
+      }
+      // Sueño
+      if(d.sleep>0 && d.sleep<7.5){
+        recs.push({
+          title:'Rutina de sueño consistente',
+          text:'Define horario fijo, reduce pantallas 60 min antes y prepara ambiente oscuro y silencioso.',
+          badge:'Sueño', level:'warn'
+        });
+      }
+      if(d.screens>6){
+        recs.push({
+          title:'Tiempo de pantallas consciente',
+          text:'Usa descansos 20-20-20, notificaciones limitadas y bloques sin pantalla antes de dormir.',
+          badge:'Pantallas', level:'warn'
+        });
+      }
+      // Ejercicio
+      if(d.exercise<150){
+        recs.push({
+          title:'Movimiento semanal progresivo',
+          text:'Comienza con caminatas de 20–30 min, 5 días, y añade fuerza con peso corporal 2–3 días.',
+          badge:'Actividad', level:'warn'
+        });
+      }
+      // Alimentación
+      if(d.junk>2){
+        recs.push({
+          title:'Reducción de ultraprocesados',
+          text:'Planifica snacks saludables (fruta, frutos secos) y bebidas sin azúcar. Reserva “chatarra” para ocasiones puntuales.',
+          badge:'Alimentación', level:'bad'
+        });
+      }
+      if(d.healthyMeals<10){
+        recs.push({
+          title:'Más platos basados en plantas',
+          text:'Incluye verduras en almuerzo y cena, legumbres 3×/semana y agua como bebida principal.',
+          badge:'Alimentación', level:'warn'
+        });
+      }
+      // IMC
+      const cat = bmiCategory(m.bmi);
+      if(cat.cls==='warn' || cat.cls==='bad'){
+        recs.push({
+          title:'Equilibrio energético informado',
+          text:'Observa porciones, saciedad y calidad de alimentos. Prioriza actividad física regular y descanso adecuado.',
+          badge:'IMC/TMB', level:cat.cls
+        });
+      }
+      // Ciclo (si hay datos)
+      if(d.cycleLength && d.lastPeriod){
+        recs.push({
+          title:'Registro de ciclo',
+          text:'Anota fechas y sensaciones (dolor, estado de ánimo). Si hay cambios grandes o molestias, habla con profesionales.',
+          badge:'Salud femenina', level:'good'
+        });
+      }
+      // Mensaje positivo
+      if(m.score>=75){
+        recs.push({
+          title:'¡Hábitos que brillan!',
+          text:'Sigue celebrando los logros. Mantén la constancia con metas pequeñas y sostenibles.',
+          badge:'Bienestar', level:'good'
+        });
+      }
+      // Si faltan datos
+      if(!isFinite(m.bmi) || !isFinite(m.bmr)){
+        recs.push({
+          title:'Completa tus datos',
+          text:'Ingresa edad, peso y estatura para ver cálculos y recomendaciones personalizadas.',
+          badge:'Datos', level:'warn'
+        });
+      }
+      return recs;
+    }
+
+    function renderRecs(list){
+      const cont = $('#recList');
+      cont.innerHTML = '';
+      list.forEach(r=>{
+        const div = document.createElement('div');
+        div.className = 'rec';
+        div.style.borderLeftColor = r.level==='bad' ? 'var(--bad)' :
+                                    r.level==='warn' ? 'var(--warn)' : 'var(--accent)';
+        div.innerHTML = `
+          <h3>${r.title}</h3>
+          <p>${r.text}</p>
+          <span class="badge">${r.badge}</span>
+        `;
+        cont.appendChild(div);
+      });
+    }
+
+    // Progreso global
+    function updateProgress(score){
+      $('#progressBar').style.width = clamp(score,0,100)+'%';
+    }
+
+    // Gráficos
+    let bmiChart, habitRadar, sleepChart, foodChart;
+
+    function initCharts(){
+      const neon = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+      const pink = getComputedStyle(document.documentElement).getPropertyValue('--pink').trim();
+      const white = getComputedStyle(document.documentElement).getPropertyValue('--white').trim();
+      const good = getComputedStyle(document.documentElement).getPropertyValue('--good').trim();
+      const bad = getComputedStyle(document.documentElement).getPropertyValue('--bad').trim();
+
+      const ctxBmi = document.getElementById('bmiChart');
+      const ctxRadar = document.getElementById('habitRadar');
+      const ctxSleep = document.getElementById('sleepChart');
+      const ctxFood = document.getElementById('foodChart');
+
+      bmiChart = new Chart(ctxBmi, {
+        type:'line',
+        data:{
+          labels: state.trend.map(t=>t.date),
+          datasets:[{
+            label:'IMC',
+            data: state.trend.map(t=>t.bmi),
+            borderColor: neon, backgroundColor: 'rgba(255,43,214,0.2)',
+            tension:0.3, fill:true
+          }]
+        },
+        options:{
+          responsive:true, plugins:{ legend:{ labels:{ color:white }}, tooltip:{ enabled:true }},
+          scales:{
+            x:{ ticks:{ color:white } },
+            y:{ ticks:{ color:white }, suggestedMin:16, suggestedMax:34 }
+          }
+        }
+      });
+
+      habitRadar = new Chart(ctxRadar, {
+        type:'radar',
+        data:{
+          labels:['Hidratación','Sueño','Ejercicio','Pantallas','Alimentación'],
+          datasets:[{
+            label:'Hábitos',
+            data:[0,0,0,0,0],
+            borderColor:pink, backgroundColor:'rgba(255,138,184,0.20)'
+          }]
+        },
+        options:{
+          responsive:true, plugins:{ legend:{ labels:{ color:white } } },
+          scales:{ r:{ angleLines:{ color:'#555' }, grid:{ color:'#333' }, pointLabels:{ color:white }, ticks:{ color:white, showLabelBackdrop:false, beginAtZero:true, max:10 } } }
+        }
+      });
+
+      sleepChart = new Chart(ctxSleep, {
+        type:'bar',
+        data:{
+          labels:['Sueño','Pantallas'],
+          datasets:[
+            { label:'Horas/día', data:[0,0], backgroundColor:[good,'#f39c12'] }
+          ]
+        },
+        options:{
+          responsive:true, plugins:{ legend:{ labels:{ color:white } } },
+          scales:{ x:{ ticks:{ color:white } }, y:{ ticks:{ color:white }, suggestedMax:12, beginAtZero:true } }
+        }
+      });
+
+      foodChart = new Chart(ctxFood, {
+        type:'bar',
+        data:{
+          labels:['Saludables','Chatarra'],
+          datasets:[
+            { label:'Porciones/semana', data:[0,0], backgroundColor:[neon,bad] }
+          ]
+        },
+        options:{
+          responsive:true, plugins:{ legend:{ labels:{ color:white } } },
+          scales:{ x:{ ticks:{ color:white } }, y:{ ticks:{ color:white }, beginAtZero:true } }
+        }
+      });
+    }
+
+    function updateCharts(d, m){
+      const today = new Date().toISOString().slice(0,10);
+      if(isFinite(m.bmi)){
+        state.trend.push({ date: today, bmi: Number(m.bmi.toFixed(2)) });
+        if(state.trend.length>12) state.trend.shift(); // último año, por ejemplo
+      }
+      // IMC trend
+      if(bmiChart){
+        bmiChart.data.labels = state.trend.map(t=>t.date);
+        bmiChart.data.datasets[0].data = state.trend.map(t=>t.bmi);
+        bmiChart.update();
+      }
+      // Radar hábitos: escala 0–10
+      const hyd = d.hydration>0 ? clamp((d.hydration/8)*10,0,10) : 0;
+      const slp = d.sleep>0 ? clamp((d.sleep/8)*10,0,10) : 0;
+      const exc = d.exercise>0 ? clamp((d.exercise/300)*10,0,10) : 0;
+      const scr = d.screens>0 ? clamp(10 - (d.screens/10)*6,0,10) : 0;
+      const food = (d.healthyMeals>=0 && d.junk>=0) ? clamp((d.healthyMeals/(d.junk+1))*2.5,0,10) : 0;
+
+      if(habitRadar){
+        habitRadar.data.datasets[0].data = [hyd, slp, exc, scr, food];
+        habitRadar.update();
+      }
+      if(sleepChart){
+        sleepChart.data.datasets[0].data = [d.sleep||0, d.screens||0];
+        sleepChart.update();
+      }
+      if(foodChart){
+        foodChart.data.datasets[0].data = [d.healthyMeals||0, d.junk||0];
+        foodChart.update();
+      }
+    }
+
+    // Render KPIs
+    function renderKPIs(m){
+      $('#bmiValue').textContent = fmt(m.bmi,1);
+      const bcat = bmiCategory(m.bmi);
+      const bmiTag = $('#bmiTag');
+      bmiTag.textContent = bcat.label;
+      bmiTag.className = 'tag ' + bcat.cls;
+
+      $('#bmrValue').textContent = fmt(m.bmr,0);
+      $('#bmrTag').textContent = tdeeTag(m.bmr).label;
+      $('#bmrTag').className = 'tag good';
+
+      $('#tdeeValue').textContent = fmt(m.tdee,0);
+      const ttag = tdeeTag(m.tdee);
+      $('#tdeeTag').textContent = ttag.label;
+      $('#tdeeTag').className = 'tag ' + ttag.cls;
+
+      $('#habitScore').textContent = fmt(m.score,0);
+      const htag = habitTag(m.score);
+      $('#habitTag').textContent = htag.label;
+      $('#habitTag').className = 'tag ' + htag.cls;
+    }
+
+    // Actualizar todo
+    function updateAll(){
+      const d = readForm();
+      const m = calcMetrics(d);
+      renderKPIs(m);
+      $('#summaryText').textContent = buildSummary(d,m);
+      renderRecs( buildRecs(d,m) );
+      updateProgress(m.score);
+      updateCharts(d,m);
+    }
+
+    // Eventos
+    $('#calcBtn').addEventListener('click', updateAll);
+
+    // Seguimiento semanal
+    const addWeekBtn = $('#addWeekBtn');
+    const clearWeeksBtn = $('#clearWeeksBtn');
+    const weeksContainer = $('#weeksContainer');
+
+    addWeekBtn.addEventListener('click', ()=>{
+      const d = readForm();
+      const m = calcMetrics(d);
+      const note = $('#weekNote').value.trim();
+      const stamp = new Date().toLocaleDateString('es-AR');
+      const item = {
+        date: stamp,
+        hydration: d.hydration||0,
+        sleep: d.sleep||0,
+        exercise: d.exercise||0,
+        screens: d.screens||0,
+        healthyMeals: d.healthyMeals||0,
+        junk: d.junk||0,
+        bmi: isFinite(m.bmi)? Number(m.bmi.toFixed(2)) : null,
+        score: m.score,
+        note
+      };
+      state.weeks.push(item);
+      renderWeeks();
+      toast('Semana agregada ✔️');
+    });
+
+    clearWeeksBtn.addEventListener('click', ()=>{
+      state.weeks = [];
+      renderWeeks();
+      toast('Registros borrados');
+    });
+
+    function renderWeeks(){
+      weeksContainer.innerHTML = '';
+      state.weeks.slice().reverse().forEach(w=>{
+        const div = document.createElement('div');
+        div.className = 'rec';
+        div.style.borderLeftColor = 'var(--accent)';
+        div.innerHTML = `
+          <h3>${w.date} — IMC: ${w.bmi ?? '—'} | Índice hábitos: ${w.score}</h3>
+          <p>Agua: ${w.hydration} vasos · Sueño: ${w.sleep} h/día · Ejercicio: ${w.exercise} min/sem · Pantallas: ${w.screens} h/día</p>
+          <p>Saludables: ${w.healthyMeals} · Chatarra: ${w.junk}</p>
+          ${w.note ? `<span class="badge">Meta</span> ${w.note}` : ''}
+        `;
+        weeksContainer.appendChild(div);
+      });
+    }
+
+    // Cargar desde localStorage
+    (function init(){
+      const saved = localStorage.getItem('healthData711');
+      if(saved){
+        try{
+          const data = JSON.parse(saved);
+          if(data.form) fillForm(data.form);
+          if(Array.isArray(data.trend)) state.trend = data.trend;
+          if(Array.isArray(data.weeks)) { state.weeks = data.weeks; renderWeeks(); }
+        }catch(e){}
+      }
+      initCharts();
+    })();
+  </script>
+</body>
+</html>
